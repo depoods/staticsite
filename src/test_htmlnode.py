@@ -1,20 +1,28 @@
 import unittest
+from htmlnode import HTMLNode, LeafNode
 
-from htmlnode import HTMLNode
 
 class TestHTMLNode(unittest.TestCase):
-    def test_probs(self):
-        node = HTMLNode()
-        node_child_1 = HTMLNode()
-        node1 = HTMLNode("p", "Hello World in HTML", [node, node_child_1], "<a>")
-        node2 = HTMLNode("a", "Hello World in HTML :)", [node, node_child_1], '{"href": "https://www.google.com"}')
+    def test_to_html_props(self):
+        node = HTMLNode(
+            "div",
+            "Hello, world!",
+            None,
+            {"class": "greeting", "href": "https://boot.dev"},
+        )
+        self.assertEqual(
+            node.props_to_html(),
+            ' class="greeting" href="https://boot.dev"',
+        )
 
-        print(node)
-        print(node_child_1)
-        print(node1)
-        print(node2)
+    def test_to_html_no_children(self):
+        node = LeafNode("p", "Hello, world!")
+        self.assertEqual(node.to_html(), "<p>Hello, world!</p>")
 
-        print(node2.props_to_html())
+    def test_to_html_no_tag(self):
+        node = LeafNode(None, "Hello, world!")
+        self.assertEqual(node.to_html(), "Hello, world!")
+
 
 if __name__ == "__main__":
     unittest.main()
