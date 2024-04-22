@@ -1,4 +1,5 @@
 from enum import Enum
+from textnode import TextNode
 
 class HTMLNode:
     def __init__(self, tag=None , value=None, children=None, props=None):   
@@ -76,13 +77,62 @@ class TextNodeType(Enum):
     IMAGE = "image"
 
 def text_node_to_html_node(text_node):
-    if text_node.text_type not in TextNodeType._value2member_map_:
-        raise Exception("Invalid text node type")
+    #if text_node.text_type not in TextNodeType._value2member_map_:
+        #raise Exception(f"Invalid text node type: {text_node.text_type}")
 
-    if text_node.text_type == TextNodeType.TEXT.value:
-        if text_node.url is None:
-            return LeafNode(value=text_node.text)
+
+    if not isinstance(text_node.text_type, TextNodeType):
+        raise Exception(f"Invalid text node type: {text_node.text_type}")
+
+    if text_node.text_type == TextNodeType.TEXT:
+        return LeafNode(value=text_node.text)
     
+    if text_node.text_type == TextNodeType.BOLD:
+        return LeafNode(tag="b", value=text_node.text)
+
+    if text_node.text_type == TextNodeType.ITALIC:
+        return LeafNode(tag="i", value=text_node.text)
+
+    if text_node.text_type == TextNodeType.CODE:
+        return LeafNode(tag="code", value=text_node.text)   
+
+    if text_node.text_type == TextNodeType.LINK:
+        return LeafNode(tag="a", value=text_node.text, props={"href": text_node.url})
+    
+    if text_node.text_type == TextNodeType.IMAGE:
+        return LeafNode(tag="img", value="", props={"src": text_node.url, "alt": text_node.text })
+
+def split_nodes_delimiter(old_nodes, delimiter, text_type):
+    return_list = []
+    for old_node in old_nodes:
+        if old_node.text_type is not TextNodeType.TEXT:
+            return_list.append(old_node)
+            continue
+        
+        if old_node.text.count(delimiter) % 2 == 0:
+            tmp_str = old_node.text.split(delimiter)
+            if tmp_str[0] == "":
+                #first char was a delimiter
+                for index, segment in enumerate(tmp_str):
+                    if index % 2 != 0: 
+                        return_list.append(TextNode(segment, text_type))
+                    else:
+                        return_list.append(TextNode(segment, old_node.text_type))
+            else:
+                #first char was not a delimiter
+                for index, segment in enumerate(tmp_str):
+                    if index % 2 == 0: 
+                        return_list.append(TextNode(segment, old_node.text_type))
+                    else:
+                        return_list.append(TextNode(segment, text_type))
+
+        else:
+            raise Exception("invalid Markdown Syntax found")
+                
+
+    
+
+
 
     
 
