@@ -25,7 +25,7 @@ class HTMLNode:
         return f"HTMLNode: tag:{self.tag} value:{self.value}, children:{self.children}, props:{self.props}"
 
 class LeafNode(HTMLNode):
-    def __init__(self, tag, value, props=None):
+    def __init__(self, tag=None, value=None, props=None):
         super().__init__(tag, value, None, props)
 
     def to_html(self):
@@ -77,9 +77,6 @@ class TextNodeType(Enum):
     IMAGE = "image"
 
 def text_node_to_html_node(text_node):
-    #if text_node.text_type not in TextNodeType._value2member_map_:
-        #raise Exception(f"Invalid text node type: {text_node.text_type}")
-
 
     if not isinstance(text_node.text_type, TextNodeType):
         raise Exception(f"Invalid text node type: {text_node.text_type}")
@@ -111,12 +108,19 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         
         if old_node.text.count(delimiter) % 2 == 0:
             tmp_str = old_node.text.split(delimiter)
+            #print(f"TMP STR: {tmp_str}")
             if tmp_str[0] == "":
+                print(f"IF PASSED{tmp_str}")
                 #first char was a delimiter
+                #Remove empty string
+                tmp_str = tmp_str[1:]
                 for index, segment in enumerate(tmp_str):
-                    if index % 2 != 0: 
+                    if index % 2 == 0: 
+                        #print(f'Segment: "{segment}" "{text_type}"')
                         return_list.append(TextNode(segment, text_type))
+                        #print(f"list: {return_list}")
                     else:
+                        #print(f'Segment: "{segment}" "{text_type}"')
                         return_list.append(TextNode(segment, old_node.text_type))
             else:
                 #first char was not a delimiter
@@ -128,32 +132,5 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
 
         else:
             raise Exception("invalid Markdown Syntax found")
-                
-
-    
-
-
-
-    
-
-
-
-        
-        
-
-        
-
-        
-
-
-
-        
-
-
-
-"""
-An HTMLNode without a tag will just render as raw text
-An HTMLNode without a value will be assumed to have children
-An HTMLNode without children will be assumed to have a value
-An HTMLNode without props simply won't have any attributes
-""" 
+    #print(return_list)
+    return return_list

@@ -4,7 +4,7 @@ from textnode import *
 from enum import Enum
 
 
-"""class TestHTMLNode(unittest.TestCase):
+class TestHTMLNode(unittest.TestCase):
     def test_to_html_props(self):
         node = HTMLNode(
             "div",
@@ -92,7 +92,7 @@ class TestParentNode(unittest.TestCase):
         ])
         self.assertEqual(node.to_html(), "<ul><li>Item 1</li><li>Item 2</li><li>Item 3</li></ul>")
 
-"""
+
 class TestTextNodeToHtmlNode(unittest.TestCase):
 
     def test_text_node_conversion(self):
@@ -109,41 +109,49 @@ class TestTextNodeToHtmlNode(unittest.TestCase):
         self.assertEqual(result.value, "Bold Text")
 
     # Add more tests for ITALIC, CODE, LINK, and IMAGE types
-"""
+
     def test_invalid_node_type(self):
         # Test handling of invalid node types
-        text_node = TextNode("unknown", "Text")
+        print("TESTING INVALID NODE TYPE")
+        text_node = TextNode("text", "unknown")
         with self.assertRaises(Exception):
             result = text_node_to_html_node(text_node)
 
     def test_splits_simple_string(self):
         # Testing a simple string split with no initial delimiter
-        old_node = [TextNode("This is text with `code` inside", TextNodeType.TEXT.value)]
+        old_node = [TextNode("This is text with `code` inside", TextNodeType.TEXT)]
         expected_result = [
-            TextNode("This is text with ", TextNodeType.TEXT.value),
+            TextNode("This is text with ", TextNodeType.TEXT),
             TextNode("code", "code"),  # Assuming your "code" text_type is just "code"
-            TextNode(" inside", TextNodeType.TEXT.value)
+            TextNode(" inside", TextNodeType.TEXT)
         ]
         result = split_nodes_delimiter(old_node, "`", "code")
         self.assertEqual(result, expected_result)
-        
+    
     def test_handles_beginning_delimiter(self):
         # Testing string that starts with a delimiter
-        old_node = [TextNode("`code` at the start", TextNodeType.TEXT.value)]
+        old_node = [TextNode("`code` at the start", TextNodeType.TEXT)]
         expected_result = [
             TextNode("code", "code"),
-            TextNode(" at the start", TextNodeType.TEXT.value)
+            TextNode(" at the start", TextNodeType.TEXT)
         ]
         result = split_nodes_delimiter(old_node, "`", "code")
+        print(result)
         self.assertEqual(result, expected_result)
 
     def test_odd_number_of_delimiters_raises_exception(self):
         # Testing to ensure the function raises an exception for an odd number of delimiters
-        old_node = [TextNode("This is `incorrect syntax", TextNodeType.TEXT.value)]
+        old_node = [TextNode("This is `incorrect syntax", TextNodeType.TEXT)]
         with self.assertRaises(Exception) as context:
             split_nodes_delimiter(old_node, "`", "code")
         self.assertTrue('invalid Markdown Syntax found' in str(context.exception))
 
-"""
+
 if __name__ == "__main__":
-    unittest.main()
+    # Create a test suite
+    suite = unittest.TestSuite()
+    # Add a specific test method to the suite
+    suite.addTest(TestTextNodeToHtmlNode("test_invalid_node_type"))    
+    # Create a TestRunner and run the suite
+    runner = unittest.TextTestRunner()
+    runner.run(suite)
