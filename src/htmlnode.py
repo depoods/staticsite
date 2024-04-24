@@ -1,5 +1,6 @@
 from enum import Enum
 from textnode import TextNode
+import re 
 
 class HTMLNode:
     def __init__(self, tag=None , value=None, children=None, props=None):   
@@ -133,4 +134,39 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
         else:
             raise Exception("invalid Markdown Syntax found")
     #print(return_list)
+    return return_list
+
+def extract_markdown_images(text):
+    return re.findall(r"!\[(.*?)\]\((.*?)\)", text)
+
+def extract_markdown_links(text):
+    return re.findall(r"\[(.*?)\]\((.*?)\)", text)
+
+def split_nodes_image(old_nodes):
+    return_list = []
+    text_parts = []
+
+    for old_node in old_nodes:
+        images = extract_markdown_images(old_node.text)
+        remaining_text = old_node.text
+
+        if(len(images)) == 0:
+            return_list.append(old_node)
+        else:
+            for image in images:
+                split_result = remaining_text.split(f"![{image[0]}]({image[1]})", 1)
+                if len(split_result) > 1:
+                    # There was at least one image, so updating the remaining_text to the part after the first image found.
+                    before_image_text = split_result[0]
+                    remaining_text = split_result[1]             
+                    if before_image_text.strip():  # Checks if the text is not just whitespace
+                        return_list.append(TextNode(before_image_text, TextNodeType.TEXT))
+
+                    return_list.append(TextNode(image[0], TextNodeType.IMAGE,image[1]))
+            # After processing all images in the loop:
+            if remaining_text.strip():  # This checks if there's any text left.
+                # You could add further checks here (like checking for not only whitespace)
+                return_list.append(TextNode(remaining_text, TextNodeType.TEXT))
+
+
     return return_list
