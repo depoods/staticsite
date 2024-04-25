@@ -111,17 +111,16 @@ def split_nodes_delimiter(old_nodes, delimiter, text_type):
             tmp_str = old_node.text.split(delimiter)
             #print(f"TMP STR: {tmp_str}")
             if tmp_str[0] == "":
-                print(f"IF PASSED{tmp_str}")
                 #first char was a delimiter
                 #Remove empty string
                 tmp_str = tmp_str[1:]
                 for index, segment in enumerate(tmp_str):
                     if index % 2 == 0: 
-                        #print(f'Segment: "{segment}" "{text_type}"')
+                        print(f'Segment: "{segment}" "{text_type}"')
                         return_list.append(TextNode(segment, text_type))
-                        #print(f"list: {return_list}")
+                        print(f"list: {return_list}")
                     else:
-                        #print(f'Segment: "{segment}" "{text_type}"')
+                        print(f'Segment: "{segment}" "{text_type}"')
                         return_list.append(TextNode(segment, old_node.text_type))
             else:
                 #first char was not a delimiter
@@ -170,3 +169,52 @@ def split_nodes_image(old_nodes):
 
 
     return return_list
+
+def split_nodes_links(old_nodes):
+    return_list = []
+    text_parts = []
+
+    for old_node in old_nodes:
+        links = extract_markdown_links(old_node.text)
+        remaining_text = old_node.text
+
+        if(len(links)) == 0:
+            return_list.append(old_node)
+        else:
+            for link in links:
+                split_result = remaining_text.split(f"[{link[0]}]({link[1]})", 1)
+                if len(split_result) > 1:
+                    # There was at least one link, so updating the remaining_text to the part after the first link found.
+                    before_link_text = split_result[0]
+                    remaining_text = split_result[1]             
+                    if before_link_text.strip():  # Checks if the text is not just whitespace
+                        return_list.append(TextNode(before_link_text, TextNodeType.TEXT))
+
+                    return_list.append(TextNode(link[0], TextNodeType.LINK,link[1]))
+            # After processing all link in the loop:
+            if remaining_text.strip():  # This checks if there's any text left.
+                # You could add further checks here (like checking for not only whitespace)
+                return_list.append(TextNode(remaining_text, TextNodeType.TEXT))
+
+
+    return return_list
+
+def text_to_textnodes(text):
+    nodes = [TextNode(text, TextNodeType.TEXT)]
+    nodes = split_nodes_delimiter(nodes, "**", TextNodeType.BOLD)
+    nodes = split_nodes_delimiter(nodes, "*", TextNodeType.ITALIC)
+    nodes = split_nodes_delimiter(nodes, "`", TextNodeType.CODE)
+    nodes = split_nodes_image(nodes)
+    nodes = split_nodes_links(nodes)
+
+    return nodes
+
+def markdown_to_blocks(markdown):
+    blocks = markdown.split("\n\n")
+    return_list = []
+    for block in blocks:
+        return_list.append(block.strip())
+
+    return return_list
+
+
