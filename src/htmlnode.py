@@ -217,4 +217,69 @@ def markdown_to_blocks(markdown):
 
     return return_list
 
+class BlockType(Enum):
+    PARA = "paragraph"
+    HEAD = "heading"
+    CODE = "code"
+    QUOTE = "quote"
+    U_LIST = "unordered_list"
+    LIST = "ordered_list"
+
+def block_to_block_type(block):
+    # Check if the block is a heading
+    heading_result = check_for_headings(block)
+    if heading_result:
+        return heading_result
+    
+    # Check if the block is code
+    code_result = check_for_code(block)
+    if code_result:
+        return code_result
+
+    quote_result = check_for_quote(block)
+    if quote_result:
+        return quote_result
+    
+    unordered_list_result = check_for_unordered_list(block)
+    if unordered_list_result:
+        return unordered_list_result
+    
+    ordered_list_result = check_for_ordered_list(block)
+    if ordered_list_result:
+        return ordered_list_result
+    
+    return BlockType.PARA
+
+    
+
+
+def check_for_headings(text):
+    if re.match(r"#{1,6}\s", text):
+        return BlockType.HEAD
+
+def check_for_code(text):
+    if text.startswith("```") and text.endswith("```"):
+        return BlockType.CODE
+
+def check_for_quote(text):
+    lines = text.split("\n")
+    for line in lines:
+        if not re.match(r"^>", line):
+            return False
+    return BlockType.QUOTE
+
+def check_for_unordered_list(text):
+    lines = text.split("\n")
+    for line in lines:
+        if not re.match(r"^(\*\s|\-\s)", line):
+            return False
+    return BlockType.U_LIST
+
+def check_for_ordered_list(text):
+    lines = text.split("\n")
+    for line in lines:
+        if not re.match(r"^\d+\.\s", line):
+            return False
+    return BlockType.LIST
+
 

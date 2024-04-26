@@ -5,32 +5,31 @@ from textnode import TextNode
 
 #from enum import Enum
 
-class TestMarkdown_to_blocks(unittest.TestCase):
+class TestMarkdownParser(unittest.TestCase):
     
-    def test_block_test(self):
-        document = """
-This is **bolded** paragraph
+    def test_heading(self):
+        # Example of a heading test
+        heading = "# This is a heading"
+        self.assertEqual(block_to_block_type(heading), BlockType.HEAD)
+    
+    def test_code(self):
+        # Example of a code block test
+        code = "```print('Hello, World!')```"
+        self.assertEqual(block_to_block_type(code), BlockType.CODE)
 
-This is another paragraph with *italic* text and `code` here
-This is the same paragraph on a new line
+    def test_quote(self):
+        quote = ">This is a Quote\n>Quiiioootteee"
+        self.assertEqual(block_to_block_type(quote), BlockType.QUOTE)
+    
+    def test_unordered_list(self):
+        unordered_list = "* List one\n* List two"
+        self.assertEqual(block_to_block_type(unordered_list), BlockType.U_LIST)
 
-* This is a list
-* with items
-"""
+    def test_ordered_list(self):
+        ordered_list = "1. List one\n2. List two"
+        self.assertEqual(block_to_block_type(ordered_list), BlockType.LIST)
 
-        expected_blocks = [
-            "This is **bolded** paragraph",
-            "This is another paragraph with *italic* text and `code` here\nThis is the same paragraph on a new line",
-            "* This is a list\n* with items"
-        ]
-
-        # Assuming markdown_to_blocks is a function you've defined elsewhere
-        actual_blocks = markdown_to_blocks(document)
-        
-        # Check if the actual output matches the expected output
-        self.assertEqual(actual_blocks, expected_blocks)
-        
-
+    # Add more tests for other block types like quote, unordered list, ordered list, etc.
 
 if __name__ == "__main__":
     unittest.main()
