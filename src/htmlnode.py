@@ -282,4 +282,45 @@ def check_for_ordered_list(text):
             return False
     return BlockType.LIST
 
+def create_quote_html_block(block):
+    return f"<blockquote>{block}</blockquote>"
 
+def create_unordered_list_html_block(block):
+    lines = block.split("\n")
+    html_block = []
+    html_block.append("<ul>")
+
+    for line in lines:
+        html_block.append(f"<li>{line[2:]}</li>")
+    
+    html_block.append("</ul>")
+    return "\n".join(html_block)
+
+def create_ordered_list_html_block(block):
+    lines = block.split("\n")
+    html_block = []
+    html_block.append("<ol>")
+
+    for line in lines:
+        html_block.append(f"<li>{line[3:]}</li>")
+    
+    html_block.append("</ol>")
+    return "\n".join(html_block)
+
+def create_code_html_block(block):
+    return f"<pre><code>{block[3:-3]}</code></pre>"
+
+def create_head_html_block(block):
+    match = re.match(r"(#{1,6})\s", block)
+    hash_count = "1"
+    if match:
+        hash_count = len(match.group(1))
+    return f"<h{hash_count}>{block.lstrip("# ")}</h{hash_count}>"
+
+def create_para_html_block(block):
+    return f"<p>{block}</p>"
+
+
+
+
+    
