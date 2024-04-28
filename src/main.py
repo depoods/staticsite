@@ -1,7 +1,9 @@
 from textnode import TextNode
+import os
 
 def main():
-    new_text = TextNode("This is a text node", "bold", "https://www.boot.dev")
+    
+    
 
 
 main()
