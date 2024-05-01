@@ -1,4 +1,5 @@
 from markdown_blocks import *
+from copystatic import *
 
 def extract_title(markdown):
     blocks = markdown_to_blocks(markdown)    
@@ -40,4 +41,36 @@ def generate_page(from_path, template_path, dest_path):
     print(f"Writing final HTML to {dest_path}")
     with open(dest_path, 'w') as file:
         file.write(final_html_content)
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path):
+    #scan dirpath
+
+    if not dir_path_content.endswith(os.sep):
+        dir_path_content += os.sep
+
+    if not dest_dir_path.endswith(os.sep):
+        dest_dir_path += os.sep
+
+
+
+    files = []
+    folders = []
+    html_path = ""
+    scan_directory(dir_path_content, files, folders)
+
+
+    for file in files:
+        if file[-3:] == ".md":
+            relative_path = file[len(dir_path_content):]  # Extract the relative path
+            html_relative_path = relative_path[:-3] + ".html"  # Replace .md with .html
+            full_html_path = os.path.join(dest_dir_path, html_relative_path)
+
+            html_dir = os.path.dirname(full_html_path)
+            os.makedirs(html_dir, exist_ok=True)
+
+            print(f"generating recursive HTML files in {full_html_path}")
+            generate_page(file, template_path, full_html_path)
+    
+
 
